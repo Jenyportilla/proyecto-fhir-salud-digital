@@ -1,3 +1,5 @@
+# Archivo principal del backend. Define todas las rutas de la API.
+
 from fastapi import FastAPI, Header, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, SessionLocal
@@ -12,10 +14,10 @@ from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 import os
 
-# Cargar variables de entorno PRIMERO
+# Cargar variables de entorno 
 load_dotenv()
 
-# Crear app PRIMERO
+# Crear app 
 app = FastAPI()
 
 # Configurar CORS (para que Swagger UI y Streamlit funcionen)
@@ -30,14 +32,14 @@ app.add_middleware(
 # Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
-# Rate limiter (Anti-DoS) - Requerimiento D.2
+# Rate limiter (Anti-DoS)
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 
 app.add_middleware(SlowAPIMiddleware)
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Encriptación (Criptografía para datos sensibles) - Requerimiento D.1
+# Encriptación
 fernet = Fernet(os.getenv("FERNET_KEY"))
 
 def encrypt_data(data):
@@ -47,9 +49,9 @@ def decrypt_data(data):
     try:
         return fernet.decrypt(data.encode()).decode()
     except:
-        return data  # Si falla, devolver original
+        return data  
 
-# Validación de API Keys (Doble autenticación) - Requerimiento B.2
+# Validación de API Keys (Doble autenticación)
 def validate_keys(
     x_access_key: str = Header(...),
     x_permission_key: str = Header(...)
@@ -69,10 +71,7 @@ def validate_keys(
     
     return x_permission_key
 
-
-# ============================================================================
 # ENDPOINTS DE PACIENTES
-# ============================================================================
 
 # Endpoint raíz
 @app.get("/")
@@ -80,16 +79,16 @@ def root():
     return {"message": "Servidor FHIR funcionando"}
 
 
-# Endpoint GET paginado para Pacientes - Requerimiento C.2
+# Endpoint GET paginado para Pacientes 
 @app.get("/fhir/Patient")
 def get_patients(limit: int = 10, offset: int = 0, role=Depends(validate_keys)):
     db = SessionLocal()
     patients = db.query(Patient).offset(offset).limit(limit).all()
-    db.close()  # Cerrar conexión a la BD
+    db.close()  
     return patients
 
 
-# Endpoint POST para Pacientes (con Rate-Limiting) - Requerimiento D.2
+# Endpoint POST para Pacientes (con Rate-Limiting) 
 @app.post("/fhir/Patient")
 @limiter.limit("5/minute")
 def create_patient(
@@ -99,7 +98,7 @@ def create_patient(
 ):
     db = SessionLocal()
 
-    # Encriptar documento (Requerimiento D.1)
+    # Encriptar documento
     encrypted_doc = encrypt_data(patient_data.identification_doc)
 
     new_patient = Patient(
@@ -119,7 +118,7 @@ def create_patient(
     }
 
 
-# Endpoint DELETE para Pacientes (Solo ADMIN) - Requerimiento B.1
+# Endpoint DELETE para Pacientes (Solo ADMIN) 
 @app.delete("/fhir/Patient/{patient_id}")
 def delete_patient(patient_id: int, role=Depends(validate_keys)):
     # Verificar que solo ADMIN pueda borrar
@@ -140,11 +139,9 @@ def delete_patient(patient_id: int, role=Depends(validate_keys)):
     return {"message": "Paciente eliminado correctamente", "id": patient_id}
 
 
-# ============================================================================
 # ENDPOINTS DE OBSERVACIONES (Signos Vitales)
-# ============================================================================
 
-# Endpoint GET para Observaciones (con nombre del paciente) - Requerimiento C.1
+# Endpoint GET para Observaciones (con nombre del paciente)
 @app.get("/fhir/Observation")
 def get_observations(role=Depends(validate_keys)):
     db = SessionLocal()
@@ -176,7 +173,7 @@ def get_observations(role=Depends(validate_keys)):
     return result
 
 
-# Endpoint POST para Observaciones (con Rate-Limiting) - Requerimiento D.2
+# Endpoint POST para Observaciones (con Rate-Limiting) 
 @app.post("/fhir/Observation")
 @limiter.limit("10/minute")
 def create_observation(
@@ -186,7 +183,7 @@ def create_observation(
 ):
     db = SessionLocal()
 
-    # Verificar que el paciente exista (Foreign Key) - Requerimiento A.2
+    # Verificar que el paciente exista (Foreign Key) 
     patient = db.query(Patient).filter(Patient.id == observation_data.patient_id).first()
 
     if not patient:
@@ -210,10 +207,7 @@ def create_observation(
         "id": new_observation.id
     }
 
-
-# ============================================================================
 # ENDPOINT DELETE PARA OBSERVACIONES (Solo ADMIN)
-# ============================================================================
 
 @app.delete("/fhir/Observation/{observation_id}")
 def delete_observation(observation_id: int, role=Depends(validate_keys)):

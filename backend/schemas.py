@@ -1,3 +1,5 @@
+# Define cómo deben verse los datos que entran y salen.
+
 from pydantic import BaseModel
 from datetime import date
 from pydantic import BaseModel

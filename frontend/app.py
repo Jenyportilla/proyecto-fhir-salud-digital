@@ -1,3 +1,5 @@
+# Es el archivo principal del frontend (Dashboard). Es la interfaz gráfica
+
 import streamlit as st
 import requests
 import plotly.express as px
@@ -6,7 +8,7 @@ import pandas as pd
 st.set_page_config(page_title="Dashboard Clínico", layout="wide")
 st.title("🏥 Dashboard Clínico - Historia FHIR")
 
-# --- LOGIN DE SEGURIDAD (Guía E.1) ---
+# --- LOGIN DE SEGURIDAD
 st.sidebar.header("🔐 Login")
 access_key = st.sidebar.text_input("Access Key", type="password")
 permission_key = st.sidebar.text_input("Permission Key", type="password")
@@ -35,13 +37,11 @@ headers = {
     "X-Permission-Key": st.session_state.permission_key
 }
 
-# URL del backend en Render
+# Esto le pide al backend la lista de pacientes cuando el médico haga clic en consultar paciente
 BACKEND_URL = "https://proyecto-fhir-api.onrender.com"
 
-# --- Pestañas para organizar ---
 tab1, tab2, tab3 = st.tabs(["👨‍️ Pacientes", " Gráficas", " Alertas"])
 
-# --- TAB 1: Lista de Pacientes ---
 with tab1:
     st.header("Lista de Pacientes")
     
@@ -64,7 +64,6 @@ with tab1:
             st.error(f"❌ Error de conexión: {str(e)}")
             st.warning("💡 El backend puede estar 'dormido'. Espera 30 segundos e intenta de nuevo.")
 
-# --- TAB 2: Gráficas de Signos Vitales ---
 with tab2:
     st.header("📈 Tendencias de Signos Vitales")
     
@@ -98,7 +97,6 @@ with tab2:
         except Exception as e:
             st.error(f"❌ Error de conexión: {str(e)}")
 
-# --- TAB 3: Alertas de Outliers (Guía E.3) ---
 with tab3:
     st.header("🚨 Alertas de Valores Imposibles")
     

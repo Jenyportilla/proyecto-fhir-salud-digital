@@ -1,3 +1,5 @@
+# Le dice a Git qué archivos NO subir a GitHub
+
 # Python - Archivos temporales
 __pycache__/
 *.py[cod]
@@ -10,7 +12,7 @@ venv/
 env/
 ENV/
 
-# Variables de entorno (¡MUY IMPORTANTE!)
+# Variables de entorno 
 .env
 *.env
 

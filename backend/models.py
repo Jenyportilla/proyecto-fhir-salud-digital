@@ -1,3 +1,5 @@
+# Define cómo se ven los datos en la base de datos.
+
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 
