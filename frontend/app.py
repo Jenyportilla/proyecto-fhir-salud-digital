@@ -132,18 +132,16 @@ with tab3:
                     st.error(f"⚠️ Se detectaron {len(outliers)} valor(es) imposible(s)")
                     df_outliers = pd.DataFrame(outliers)
                     
-                    # Mostrar tabla con estilo (fondo rojo en Alerta)
+                    # Mostrar tabla simple
                     st.dataframe(
-                        df_outliers[["Nombre del Paciente", "Tipo", "Valor", "Unidad", "Alerta"]].style.applymap(
-                            lambda x: "background-color: #ff4444; color: white; font-weight: bold", 
-                            subset=["Alerta"]
-                        ),
+                        df_outliers[["Nombre del Paciente", "Tipo", "Valor", "Unidad", "Alerta"]],
                         use_container_width=True,
                         hide_index=True
                     )
+                    st.markdown("""
+                    <style>
+                    .alerta-row { background-color: #ff4444; color: white; font-weight: bold; }
+                    </style>
+                    """, unsafe_allow_html=True)
                 else:
                     st.success("✅ No se detectaron outliers. Todos los valores son válidos.")
-            else:
-                st.info("No hay observaciones para verificar")
-        else:
-            st.error(f"❌ Error {response.status_code}")
