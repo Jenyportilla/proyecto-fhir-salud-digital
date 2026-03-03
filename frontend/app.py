@@ -43,7 +43,7 @@ with tab1:
     st.header("Lista de Pacientes")
     
     if st.button("Consultar Pacientes"):
-        response = requests.get("http://127.0.0.1:8000/fhir/Patient", headers=headers)
+        response = requests.get("https://proyecto-fhir-api.onrender.com/fhir/Patient", headers=headers)
         
         if response.status_code == 200:
             pacientes = response.json()
@@ -63,7 +63,7 @@ with tab2:
     st.header("📈 Tendencias de Signos Vitales")
     
     if st.button("Cargar Observaciones"):
-        response = requests.get("http://127.0.0.1:8000/fhir/Observation", headers=headers)
+        response = requests.get("https://proyecto-fhir-api.onrender.com/fhir/Observation", headers=headers)
         
         if response.status_code == 200:
             observaciones = response.json()
@@ -94,7 +94,7 @@ with tab3:
     st.header("🚨 Alertas de Valores Imposibles")
     
     if st.button("Verificar Outliers"):
-        response = requests.get("http://127.0.0.1:8000/fhir/Observation", headers=headers)
+        response = requests.get("https://proyecto-fhir-api.onrender.com/fhir/Observation", headers=headers)
         
         if response.status_code == 200:
             observaciones = response.json()
