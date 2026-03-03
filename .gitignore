@@ -1,0 +1,28 @@
+# Python - Archivos temporales
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# Variables de entorno (¡MUY IMPORTANTE!)
+.env
+*.env
+
+# IDE - Configuración personal
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
