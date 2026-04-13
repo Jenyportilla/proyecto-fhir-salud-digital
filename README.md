@@ -24,5 +24,5 @@ Sistema de gestión de historias clínicas basado en el estándar FHIR con API R
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/jfgarzon1990/proyecto-fhir-salud-digital.git
+git clone https://github.com/jfgarzon1998/proyecto-fhir-salud-digital.git
 cd proyecto-fhir-salud-digital

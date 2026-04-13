@@ -55,7 +55,7 @@ export default function Login() {
         <div className="login-header">
           <div className="login-logo-box">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </div>
           <h1 className="login-title">FHIR Salud Digital</h1>
@@ -93,23 +93,19 @@ export default function Login() {
             />
           </div>
 
-          <details className="api-keys-section">
-            <summary className="api-keys-toggle">API Keys (autenticacion doble)</summary>
-            <div className="api-keys-fields">
-              <div className="form-group">
-                <label className="form-label">X-Access-Key</label>
-                <input type="text" className="input" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">X-Permission-Key</label>
-                <select className="input" value={permissionKey} onChange={(e) => setPermissionKey(e.target.value)}>
-                  <option value="admin-permission">Admin</option>
-                  <option value="medico-permission">Medico</option>
-                  <option value="paciente-permission">Paciente</option>
-                </select>
-              </div>
+          {/* API Keys — ocultas del diseño, la lógica se conserva */}
+          <div style={{ display: 'none' }}>
+            <div className="form-group">
+              <input type="text" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} />
             </div>
-          </details>
+            <div className="form-group">
+              <select value={permissionKey} onChange={(e) => setPermissionKey(e.target.value)}>
+                <option value="admin-permission">Admin</option>
+                <option value="medico-permission">Medico</option>
+                <option value="paciente-permission">Paciente</option>
+              </select>
+            </div>
+          </div>
 
           <button type="submit" className="btn btn-primary btn-lg login-btn" disabled={loading}>
             {loading ? <span className="spinner" /> : 'Iniciar Sesion'}
