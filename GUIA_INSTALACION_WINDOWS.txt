@@ -1,0 +1,316 @@
+================================================================================
+  GUIA DE INSTALACION - FHIR Salud Digital
+  Sistema de Gestion de Historias Clinicas
+  (Para Windows 10/11)
+================================================================================
+
+LISTA DE CHEQUEO - SOFTWARE NECESARIO
+================================================================================
+
+  [ ] Python 3.9 o superior
+  [ ] PostgreSQL 15 o superior
+  [ ] Node.js 18 o superior (incluye npm)
+  [ ] Git (para clonar el repositorio)
+  [ ] Editor de codigo (VS Code recomendado)
+
+
+================================================================================
+PASO 1: INSTALAR PYTHON
+================================================================================
+
+  1. Ir a https://www.python.org/downloads/
+  2. Descargar la version mas reciente (3.12+ recomendado)
+  3. Al instalar, MARCAR la casilla "Add Python to PATH" (MUY IMPORTANTE)
+  4. Click en "Install Now"
+  5. Verificar instalacion abriendo CMD o PowerShell:
+
+     python --version
+     pip --version
+
+  Si aparece la version, esta correctamente instalado.
+
+
+================================================================================
+PASO 2: INSTALAR POSTGRESQL
+================================================================================
+
+  1. Ir a https://www.postgresql.org/download/windows/
+  2. Descargar el instalador de EnterpriseDB
+  3. Ejecutar el instalador:
+     - Seleccionar todos los componentes
+     - Puerto: 5432 (dejar el default)
+     - Contrasena del superusuario: 1234
+       (IMPORTANTE: usar "1234" para que coincida con el .env)
+     - Locale: Spanish o Default
+  4. Completar la instalacion
+  5. Abrir pgAdmin 4 (se instala junto con PostgreSQL)
+
+  CREAR LA BASE DE DATOS:
+  -----------------------
+  Opcion A: Desde pgAdmin 4
+    - Abrir pgAdmin 4
+    - Click derecho en "Databases" > "Create" > "Database"
+    - Nombre: fhir_salud_digital
+    - Owner: postgres
+    - Click en "Save"
+
+  Opcion B: Desde la terminal (CMD o PowerShell)
+    - Abrir CMD como administrador
+    - Ejecutar:
+
+      "C:\Program Files\PostgreSQL\15\bin\psql.exe" -U postgres
+      (ingresar contrasena: 1234)
+
+      CREATE DATABASE fhir_salud_digital;
+      \q
+
+  NOTA: Si la ruta de psql es diferente, buscar donde se instalo PostgreSQL.
+  Puede ser "C:\Program Files\PostgreSQL\16\bin\psql.exe" o similar.
+
+
+================================================================================
+PASO 3: INSTALAR NODE.JS
+================================================================================
+
+  1. Ir a https://nodejs.org/
+  2. Descargar la version LTS (Long Term Support)
+  3. Ejecutar el instalador, dar "Next" en todo
+  4. Verificar instalacion:
+
+     node --version
+     npm --version
+
+
+================================================================================
+PASO 4: INSTALAR GIT
+================================================================================
+
+  1. Ir a https://git-scm.com/download/win
+  2. Descargar e instalar (dejar opciones por defecto)
+  3. Verificar:
+
+     git --version
+
+
+================================================================================
+PASO 5: CLONAR O COPIAR EL PROYECTO
+================================================================================
+
+  Opcion A: Si el proyecto esta en GitHub/GitLab:
+
+     git clone <URL_DEL_REPOSITORIO>
+     cd proyecto-fhir-salud-digital-main
+
+  Opcion B: Si se pasa por USB/ZIP:
+     - Descomprimir la carpeta en un lugar conocido
+       (ej: C:\Users\TuUsuario\Documents\proyecto-fhir-salud-digital-main)
+     - Abrir CMD y navegar a la carpeta:
+
+       cd C:\Users\TuUsuario\Documents\proyecto-fhir-salud-digital-main
+
+
+================================================================================
+PASO 6: CONFIGURAR Y LEVANTAR EL BACKEND
+================================================================================
+
+  6.1 Abrir una terminal (CMD o PowerShell) y navegar al backend:
+
+      cd proyecto-fhir-salud-digital-main\backend
+
+  6.2 Crear un entorno virtual de Python:
+
+      python -m venv venv
+
+  6.3 Activar el entorno virtual:
+
+      venv\Scripts\activate
+
+      (Deberia aparecer "(venv)" al inicio de la linea)
+
+  6.4 Instalar dependencias:
+
+      pip install -r requirements.txt
+
+      NOTA: Si falla la instalacion de psycopg2-binary, intentar:
+        pip install psycopg2
+
+      Si falla bcrypt, intentar:
+        pip install bcrypt==4.2.1
+
+  6.5 Configurar variables de entorno:
+
+      - Verificar que exista el archivo .env en la carpeta backend
+      - Si NO existe, copiar .env.example y renombrarlo a .env
+      - Abrir .env con un editor y verificar que tenga:
+
+      DATABASE_URL=postgresql://postgres:1234@localhost:5432/fhir_salud_digital
+      JWT_SECRET=fhir-salud-digital-jwt-secret-2026-xK9mP2
+      ACCESS_KEY=master-access-key
+      ADMIN_PERM_KEY=admin-permission
+      MEDICO_PERM_KEY=medico-permission
+      PACIENTE_PERM_KEY=paciente-permission
+      ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:8501
+      MAX_WORKERS=4
+
+      IMPORTANTE: Si la contrasena de PostgreSQL es diferente a "1234",
+      cambiar el valor de DATABASE_URL para que coincida.
+
+  6.6 Poblar la base de datos con datos de prueba:
+
+      python seed_db.py
+
+      Esto crea las tablas, usuarios, pacientes y observaciones de ejemplo.
+
+  6.7 Levantar el servidor backend:
+
+      uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+      Deberia mostrar:
+        INFO: Uvicorn running on http://0.0.0.0:8000
+
+      Verificar en el navegador: http://localhost:8000/docs
+      (Deberia mostrar la documentacion Swagger de la API)
+
+      DEJAR ESTA TERMINAL ABIERTA (el servidor debe seguir corriendo)
+
+
+================================================================================
+PASO 7: CONFIGURAR Y LEVANTAR EL FRONTEND
+================================================================================
+
+  7.1 Abrir OTRA terminal (CMD o PowerShell) y navegar al frontend:
+
+      cd proyecto-fhir-salud-digital-main\frontend
+
+  7.2 Instalar dependencias:
+
+      npm install
+
+      (Esto puede tardar unos minutos la primera vez)
+
+  7.3 Levantar el servidor frontend:
+
+      npm run dev
+
+      Deberia mostrar:
+        Local:   http://localhost:5173/
+
+      DEJAR ESTA TERMINAL ABIERTA
+
+  7.4 Abrir en el navegador:
+
+      http://localhost:5173
+
+
+================================================================================
+PASO 8: PROBAR LA APLICACION
+================================================================================
+
+  Credenciales de acceso:
+
+  +----------------+------------------------+------------------+
+  | Rol            | Email                  | Contrasena       |
+  +----------------+------------------------+------------------+
+  | Administrador  | admin@clinica.com      | Admin2026!       |
+  | Medico         | medico2@clinica.com    | Medico2026!      |
+  | Medico         | scortes@clinica.com    | Medico2026!      |
+  | Paciente       | paciente@clinica.com   | Paciente2026!    |
+  +----------------+------------------------+------------------+
+
+  Funcionalidades principales:
+
+  - Dashboard: Estadisticas generales del sistema
+  - Pacientes: CRUD completo, asignacion de medico
+  - Observaciones: Crear/editar/eliminar registros clinicos (busqueda por cedula)
+  - Admin: Gestion de usuarios (crear/editar/eliminar), audit log, estadisticas
+
+
+================================================================================
+SOLUCION DE PROBLEMAS COMUNES
+================================================================================
+
+  PROBLEMA: "python no se reconoce como comando"
+  SOLUCION: Reinstalar Python marcando "Add to PATH", o agregar manualmente:
+            Panel de Control > Sistema > Variables de Entorno > Path
+            Agregar: C:\Users\TuUsuario\AppData\Local\Programs\Python\Python312\
+
+  PROBLEMA: "pip install falla con psycopg2"
+  SOLUCION: Usar "pip install psycopg2-binary" o instalar Microsoft C++ Build Tools
+
+  PROBLEMA: "El backend no conecta a PostgreSQL"
+  SOLUCION: 
+    1. Verificar que PostgreSQL este corriendo (Servicios de Windows > postgresql)
+    2. Verificar la contrasena en el .env
+    3. Verificar que la base de datos "fhir_salud_digital" exista
+
+  PROBLEMA: "npm install falla"
+  SOLUCION: Borrar la carpeta node_modules y package-lock.json, luego reintentar:
+            rmdir /s /q node_modules
+            del package-lock.json
+            npm install
+
+  PROBLEMA: "CORS error en el navegador"
+  SOLUCION: Verificar que el .env tenga http://localhost:5173 en ALLOWED_ORIGINS
+
+  PROBLEMA: "El frontend no carga datos"
+  SOLUCION: Verificar que el backend este corriendo en http://localhost:8000
+            y que se haya ejecutado "python seed_db.py"
+
+  PROBLEMA: "Error de bcrypt al instalar"
+  SOLUCION: Instalar una version compatible:
+            pip install bcrypt==4.2.1
+            pip install passlib[bcrypt]==1.7.4
+
+
+================================================================================
+ESTRUCTURA DEL PROYECTO
+================================================================================
+
+  proyecto-fhir-salud-digital-main/
+  |
+  |-- backend/                  <- API REST (Python/FastAPI)
+  |   |-- main.py               <- Punto de entrada del servidor
+  |   |-- models.py             <- Modelos de base de datos (SQLAlchemy)
+  |   |-- schemas.py            <- Validacion de datos (Pydantic)
+  |   |-- auth.py               <- Autenticacion JWT + RBAC
+  |   |-- database.py           <- Conexion a PostgreSQL
+  |   |-- seed_db.py            <- Script para poblar la BD
+  |   |-- requirements.txt      <- Dependencias Python
+  |   |-- .env                  <- Variables de entorno (NO subir a Git)
+  |   |-- routers/
+  |       |-- admin.py          <- Endpoints de administracion
+  |       |-- auth_router.py    <- Login, registro, habeas data
+  |       |-- patients.py       <- CRUD de pacientes (FHIR)
+  |       |-- observations.py   <- CRUD de observaciones (LOINC)
+  |
+  |-- frontend/                 <- Interfaz web (React + Vite)
+  |   |-- src/
+  |       |-- pages/            <- Paginas (Dashboard, Patients, Observations, Admin)
+  |       |-- context/          <- AuthContext (manejo de sesion)
+  |       |-- services/         <- api.js (conexion al backend)
+  |       |-- index.css         <- Estilos globales
+  |
+  |-- README.md
+
+
+================================================================================
+RESUMEN RAPIDO (para los que van de prisa)
+================================================================================
+
+  Terminal 1 (Backend):
+    cd backend
+    python -m venv venv
+    venv\Scripts\activate
+    pip install -r requirements.txt
+    python seed_db.py
+    uvicorn main:app --reload --port 8000
+
+  Terminal 2 (Frontend):
+    cd frontend
+    npm install
+    npm run dev
+
+  Abrir: http://localhost:5173
+  Login: admin@clinica.com / Admin2026!
+
+================================================================================

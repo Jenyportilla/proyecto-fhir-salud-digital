@@ -1,0 +1,34 @@
+# ════════════════════════════════════════════
+# Dependencias Backend — FHIR Salud Digital C2
+# ════════════════════════════════════════════
+
+# Framework web
+fastapi==0.134.0
+uvicorn==0.41.0
+
+# Base de datos
+SQLAlchemy==2.0.47
+psycopg2-binary==2.9.11
+
+# Autenticación y seguridad
+python-jose[cryptography]==3.4.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
+
+# Validación de datos
+pydantic[email-validator]==2.12.5
+
+# Variables de entorno
+python-dotenv==1.2.1
+
+# Rate limiting
+slowapi==0.1.9
+
+# Encriptación (legacy C1, se mantiene por compatibilidad)
+cryptography==46.0.5
+
+# HTTP
+starlette==0.52.1
+
+# Utilidades
+python-multipart==0.0.20
