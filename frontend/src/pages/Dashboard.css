@@ -6,10 +6,58 @@
   gap: var(--space-8);
 }
 
-.page-header {
+/* ─── Welcome Banner ─── */
+.welcome-banner {
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f2746 40%, #1a2235 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-8);
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.welcome-greeting {
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+
+.welcome-name {
+  font-size: var(--text-3xl);
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.welcome-role {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+}
+
+.welcome-date {
+  text-align: right;
+}
+
+.welcome-day {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
 }
 
 .page-title {
@@ -45,6 +93,14 @@
   border-color: var(--color-border-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.stat-card-warning {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.stat-card-warning:hover {
+  border-color: var(--color-warning);
 }
 
 .stat-icon {
@@ -84,6 +140,17 @@
 /* ─── Sections ─── */
 .dashboard-section {
   animation: fadeIn 0.4s ease-out;
+}
+
+.pending-section {
+  border-left: 3px solid var(--color-warning);
+}
+
+.pending-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-4);
+  font-style: italic;
 }
 
 .section-title {

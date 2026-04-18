@@ -66,11 +66,15 @@ from routers.auth_router import router as auth_router
 from routers.patients import router as patients_router
 from routers.observations import router as observations_router
 from routers.admin import router as admin_router
+from routers.images import router as images_router
+from routers.inference import router as inference_router
 
 app.include_router(auth_router)
 app.include_router(patients_router)
 app.include_router(observations_router)
 app.include_router(admin_router)
+app.include_router(images_router)
+app.include_router(inference_router)
 
 
 # ──────────────────────────────────────────

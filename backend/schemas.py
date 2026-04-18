@@ -137,6 +137,7 @@ class RiskReportResponse(BaseModel):
 class SignReportRequest(BaseModel):
     clinical_notes: str = Field(..., min_length=30)
     action: str = Field(..., pattern="^(ACCEPT|REJECT)$")
+    justification: Optional[str] = None  # >= 20 chars si REJECT
 
 
 # ──────────────────────────────────────────
@@ -155,6 +156,24 @@ class InferenceStatusResponse(BaseModel):
     status: str
     result: Optional[dict] = None
     error_msg: Optional[str] = None
+
+
+# ──────────────────────────────────────────
+# IMÁGENES MÉDICAS
+# ──────────────────────────────────────────
+class ImageResponse(BaseModel):
+    id: UUID
+    patient_id: UUID
+    original_filename: Optional[str]
+    content_type: str
+    modality: Optional[str]
+    description: Optional[str]
+    uploaded_by: Optional[UUID]
+    presigned_url: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # ──────────────────────────────────────────
@@ -191,3 +210,15 @@ class PaginatedResponse(BaseModel):
     limit: int
     offset: int
     data: List[dict]
+
+
+# ──────────────────────────────────────────
+# INFERENCE
+# ──────────────────────────────────────────
+class InferenceMLRequest(BaseModel):
+    patient_id: UUID
+    features: dict  # Glucose, BMI, Age, etc.
+
+class InferenceDLRequest(BaseModel):
+    patient_id: UUID
+    image_url: str  # URL de la imagen en MinIO

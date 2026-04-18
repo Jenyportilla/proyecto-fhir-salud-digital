@@ -17,6 +17,7 @@ bcrypt==4.3.0
 
 # Validación de datos
 pydantic[email-validator]==2.12.5
+email-validator==2.2.0
 
 # Variables de entorno
 python-dotenv==1.2.1
@@ -32,3 +33,9 @@ starlette==0.52.1
 
 # Utilidades
 python-multipart==0.0.20
+
+# MinIO (almacenamiento de imágenes médicas)
+minio==7.2.15
+
+# HTTP client async (para proxy al orquestador)
+httpx==0.28.1

@@ -168,7 +168,7 @@ def seed():
         random.seed(42)
         obs_count = 0
 
-        for patient in patients[:10]:  # Observaciones para los primeros 10 pacientes
+        for patient in patients:  # Observaciones para TODOS los pacientes
             for loinc in loinc_codes:
                 for _ in range(3):  # 3 observaciones por tipo
                     obs = Observation(
@@ -182,6 +182,56 @@ def seed():
                     obs_count += 1
 
         print(f"   {obs_count} observaciones creadas")
+
+        # ══════════════════════════════════════
+        # RISK REPORTS DE PRUEBA
+        # ══════════════════════════════════════
+        print("\nCreando risk reports de prueba...")
+
+        from models import RiskReport
+        reports_count = 0
+
+        # Crear reports para los primeros 10 pacientes (mix firmados/pendientes)
+        for i, patient in enumerate(patients[:10]):
+            risk_score = round(random.uniform(0.1, 0.95), 4)
+            if risk_score >= 0.75:
+                category = "CRITICAL"
+            elif risk_score >= 0.50:
+                category = "HIGH"
+            elif risk_score >= 0.30:
+                category = "MEDIUM"
+            else:
+                category = "LOW"
+
+            report = RiskReport(
+                patient_id=patient.id,
+                model_type=random.choice(["ML", "DL"]),
+                risk_score=risk_score,
+                risk_category=category,
+                risk_prediction={
+                    "diabetes_positive": risk_score,
+                    "diabetes_negative": round(1 - risk_score, 4),
+                },
+                shap_values={
+                    "Glucose": round(random.uniform(-0.1, 0.3), 4),
+                    "BMI": round(random.uniform(-0.05, 0.2), 4),
+                    "Age": round(random.uniform(-0.05, 0.12), 4),
+                    "BloodPressure": round(random.uniform(-0.05, 0.1), 4),
+                    "Insulin": round(random.uniform(-0.05, 0.1), 4),
+                },
+            )
+
+            # Firmar la mitad de los reports
+            if i < 5:
+                report.signed_by = medico1.id if patient.assigned_doctor_id == medico1.id else medico2.id
+                report.signed_at = datetime.now(timezone.utc)
+                report.clinical_notes = f"Paciente evaluado. Score {category}. Se recomienda seguimiento."
+                report.feedback = "ACCEPT"
+
+            db.add(report)
+            reports_count += 1
+
+        print(f"   {reports_count} risk reports creados ({reports_count // 2} firmados, {reports_count - reports_count // 2} pendientes)")
 
         # ── Commit todo ──
         db.commit()
@@ -198,7 +248,7 @@ def seed():
         print("│ Médico 2     │ medico2@clinica.com  │ Medico2026!    │")
         print("│ Paciente     │ paciente@clinica.com │ Paciente2026!  │")
         print("└──────────────┴──────────────────────┴────────────────┘")
-        print(f"\n Resumen: {4} usuarios, {len(patients)} pacientes, {obs_count} observaciones")
+        print(f"\n Resumen: {4} usuarios, {len(patients)} pacientes, {obs_count} observaciones, {reports_count} risk reports")
         print("\n API Keys para headers:")
         print("  X-Access-Key: master-access-key")
         print("  X-Permission-Key: admin-permission | medico-permission | paciente-permission")

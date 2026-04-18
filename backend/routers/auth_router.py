@@ -100,3 +100,20 @@ def get_me(current_user: User = Depends(get_current_user)):
         "role": current_user.role,
         "habeas_data_accepted": current_user.habeas_data_accepted,
     }
+
+
+@router.post("/logout")
+def logout(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Cerrar sesión. Registra LOGOUT en audit log.
+    (El frontend debe eliminar el token JWT del almacenamiento local).
+    """
+    log_audit(
+        db, current_user.id, "LOGOUT", "User", str(current_user.id),
+        ip_address=request.client.host,
+    )
+    return {"message": "Sesión cerrada exitosamente"}

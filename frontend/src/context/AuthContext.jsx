@@ -29,7 +29,8 @@ export function AuthProvider({ children }) {
     return userData;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try { await authAPI.logout(); } catch (e) { /* Ignorar errores de red */ }
     localStorage.clear();
     setUser(null);
   };

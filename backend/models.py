@@ -75,6 +75,29 @@ class Patient(Base):
     assigned_doctor = relationship("User", back_populates="assigned_patients", foreign_keys=[assigned_doctor_id])
     observations = relationship("Observation", back_populates="patient")
     risk_reports = relationship("RiskReport", back_populates="patient")
+    images = relationship("Image", back_populates="patient")
+
+
+# ──────────────────────────────────────────
+# IMÁGENES MÉDICAS (FHIR Media → MinIO)
+# ──────────────────────────────────────────
+class Image(Base):
+    __tablename__ = "images"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    patient_id = Column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
+    minio_key = Column(Text, nullable=False)          # Key del objeto en MinIO (cifrado)
+    original_filename = Column(String(500))            # Nombre original del archivo
+    content_type = Column(String(100), default="image/jpeg")
+    modality = Column(String(50))                      # FUNDUS, XRAY, DERM, CT, MRI
+    description = Column(Text)                         # Descripción clínica
+    uploaded_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    deleted_at = Column(DateTime(timezone=True))       # Soft-delete
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+    # Relationships
+    patient = relationship("Patient", back_populates="images")
+    uploader = relationship("User")
 
 
 # ──────────────────────────────────────────

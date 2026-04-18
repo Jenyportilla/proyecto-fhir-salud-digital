@@ -1,0 +1,6 @@
+fastapi==0.134.0
+uvicorn==0.41.0
+numpy==2.2.4
+Pillow==11.2.1
+minio==7.2.15
+python-multipart==0.0.20

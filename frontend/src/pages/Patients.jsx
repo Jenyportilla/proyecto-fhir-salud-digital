@@ -27,6 +27,13 @@ export default function Patients() {
   useEffect(() => {
     loadPatients();
     loadDoctors();
+
+    // Auto-abrir paciente si viene del Dashboard
+    const viewId = sessionStorage.getItem('viewPatientId');
+    if (viewId) {
+      setSelectedId(viewId);
+      sessionStorage.removeItem('viewPatientId');
+    }
   }, []);
 
   useEffect(() => { loadPatients(); }, [page]);

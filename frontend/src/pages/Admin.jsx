@@ -196,9 +196,9 @@ export default function Admin() {
                 <thead>
                   <tr>
                     <th>Accion</th>
+                    <th>Usuario</th>
                     <th>Recurso</th>
                     <th>Estado</th>
-                    <th>IP</th>
                     <th>Fecha</th>
                   </tr>
                 </thead>
@@ -206,11 +206,20 @@ export default function Admin() {
                   {auditLog.map((entry) => (
                     <tr key={entry.id}>
                       <td className="td-name">{entry.action}</td>
+                      <td>
+                        <div>
+                          <span style={{ fontWeight: 500 }}>{entry.user_name || '\u2014'}</span>
+                          {entry.user_email && (
+                            <span style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
+                              {entry.user_email}
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td>{entry.resource_type || '\u2014'}</td>
                       <td>
                         <span className={`badge ${entry.status === 'SUCCESS' ? 'badge-success' : 'badge-danger'}`}>{entry.status}</span>
                       </td>
-                      <td className="mono" style={{ fontSize: 'var(--text-xs)' }}>{entry.ip_address || '\u2014'}</td>
                       <td className="td-date">{entry.timestamp?.replace('T', ' ').split('.')[0] || '\u2014'}</td>
                     </tr>
                   ))}

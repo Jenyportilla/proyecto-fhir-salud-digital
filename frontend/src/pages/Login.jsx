@@ -16,22 +16,38 @@ export default function Login() {
   const { login, acceptHabeasData } = useAuth();
   const navigate = useNavigate();
 
+  const ROLE_PERMISSION_MAP = {
+    admin: 'admin-permission',
+    medico: 'medico-permission',
+    paciente: 'paciente-permission',
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     localStorage.setItem('accessKey', accessKey);
+    // Se setea temporalmente para el login, luego se ajusta al rol real
     localStorage.setItem('permissionKey', permissionKey);
 
     try {
       const userData = await login(email, password);
+      // Auto-ajustar permissionKey según el rol del usuario autenticado
+      const correctPermKey = ROLE_PERMISSION_MAP[userData.role] || 'paciente-permission';
+      localStorage.setItem('permissionKey', correctPermKey);
+
       if (!userData.habeas_data_accepted) {
         setShowHabeas(true);
       } else {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error de conexion con el servidor');
+      const detail = err.response?.data?.detail;
+      if (err.response?.status === 401) {
+        setError('Usuario o contrasena incorrecta');
+      } else {
+        setError(detail || 'Error de conexion con el servidor');
+      }
     } finally {
       setLoading(false);
     }
@@ -76,7 +92,7 @@ export default function Login() {
               className="input"
               placeholder="usuario@clinica.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
               required
             />
           </div>

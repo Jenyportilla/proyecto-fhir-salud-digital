@@ -19,7 +19,9 @@ dist/
 
 # Variables de entorno 
 .env
-*.env
+!.env.docker
+!.env.example
+!backend/.env.example
 
 # IDE - Configuración personal
 .vscode/
@@ -33,3 +35,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# MinIO binary y datos locales
+backend/minio
+backend/minio-data/

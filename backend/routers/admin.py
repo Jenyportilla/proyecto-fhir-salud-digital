@@ -163,18 +163,42 @@ def list_doctors(
 def list_audit_log(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    action: str = Query(None, description="Filtrar por acción"),
+    action: str = Query(None, description="Filtrar por acción (LOGIN, LOGOUT, etc.)"),
+    user_id: str = Query(None, description="Filtrar por ID de usuario"),
+    resource_type: str = Query(None, description="Filtrar por tipo de recurso (Patient, User, etc.)"),
+    date_from: str = Query(None, description="Fecha desde (YYYY-MM-DD)"),
+    date_to: str = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
     current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Ver audit log (solo Admin). Filtrable por acción."""
+    """
+    Ver audit log (solo Admin). Filtrable por acción, usuario, recurso y fechas.
+    También como FHIR AuditEvent.
+    """
     query = db.query(AuditLog)
 
     if action:
         query = query.filter(AuditLog.action == action)
+    if user_id:
+        query = query.filter(AuditLog.user_id == UUID(user_id))
+    if resource_type:
+        query = query.filter(AuditLog.resource_type == resource_type)
+    if date_from:
+        from datetime import datetime as dt
+        query = query.filter(AuditLog.timestamp >= dt.fromisoformat(date_from))
+    if date_to:
+        from datetime import datetime as dt
+        query = query.filter(AuditLog.timestamp <= dt.fromisoformat(date_to + "T23:59:59"))
 
     total = query.count()
     entries = query.order_by(AuditLog.timestamp.desc()).offset(offset).limit(limit).all()
+
+    # Obtener nombres de usuarios
+    user_ids = {e.user_id for e in entries if e.user_id}
+    user_map = {}
+    if user_ids:
+        users = db.query(User).filter(User.id.in_(user_ids)).all()
+        user_map = {u.id: {"name": u.full_name, "email": u.email} for u in users}
 
     return {
         "total": total,
@@ -184,6 +208,8 @@ def list_audit_log(
             {
                 "id": str(e.id),
                 "user_id": str(e.user_id) if e.user_id else None,
+                "user_name": user_map.get(e.user_id, {}).get("name", "Desconocido"),
+                "user_email": user_map.get(e.user_id, {}).get("email", ""),
                 "action": e.action,
                 "resource_type": e.resource_type,
                 "resource_id": e.resource_id,
@@ -195,6 +221,59 @@ def list_audit_log(
             for e in entries
         ],
     }
+
+
+@router.get("/audit-log/export")
+def export_audit_log(
+    format: str = Query("json", description="Formato de exportación: json o csv"),
+    action: str = Query(None),
+    user_id: str = Query(None),
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Exportar audit log en formato JSON o CSV (solo Admin)."""
+    query = db.query(AuditLog)
+
+    if action:
+        query = query.filter(AuditLog.action == action)
+    if user_id:
+        query = query.filter(AuditLog.user_id == UUID(user_id))
+
+    entries = query.order_by(AuditLog.timestamp.desc()).all()
+
+    data = [
+        {
+            "id": str(e.id),
+            "user_id": str(e.user_id) if e.user_id else None,
+            "action": e.action,
+            "resource_type": e.resource_type,
+            "resource_id": e.resource_id,
+            "status": e.status,
+            "ip_address": e.ip_address,
+            "timestamp": e.timestamp.isoformat() if e.timestamp else None,
+        }
+        for e in entries
+    ]
+
+    if format.lower() == "csv":
+        import csv
+        import io
+        from fastapi.responses import StreamingResponse
+
+        output = io.StringIO()
+        if data:
+            writer = csv.DictWriter(output, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=audit_log.csv"},
+        )
+
+    return {"total": len(data), "data": data}
 
 
 # ──────────────────────────────────────────
