@@ -43,8 +43,10 @@ export default function Login() {
       }
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (err.response?.status === 401) {
-        setError('Usuario o contrasena incorrecta');
+      if (err.response?.status === 423) {
+        setError(detail || 'Cuenta bloqueada temporalmente');
+      } else if (err.response?.status === 401) {
+        setError(detail || 'Usuario o contrasena incorrecta');
       } else {
         setError(detail || 'Error de conexion con el servidor');
       }
@@ -93,6 +95,12 @@ export default function Login() {
               placeholder="usuario@clinica.com"
               value={email}
               onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
+              onKeyDown={(e) => { if (e.key === ' ') e.preventDefault(); }}
+              onPaste={(e) => {
+                e.preventDefault();
+                const text = e.clipboardData.getData('text').replace(/\s/g, '');
+                setEmail(text);
+              }}
               required
             />
           </div>

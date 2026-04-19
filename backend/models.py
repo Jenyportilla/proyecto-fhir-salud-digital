@@ -33,6 +33,8 @@ class User(Base):
     habeas_data_accepted = Column(Boolean, default=False)
     habeas_data_timestamp = Column(DateTime(timezone=True))
     habeas_data_ip = Column(String(45))
+    failed_login_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime(timezone=True))
     deleted_at = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), default=utcnow)
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
