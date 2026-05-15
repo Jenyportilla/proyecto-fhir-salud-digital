@@ -175,7 +175,5 @@ proyecto-fhir-salud-digital/
     └── orchestrator.py
 ```
 
-## Autores
-
-- Jose Garzon — Desarrollo Backend, Frontend, ML/DL
+Jeny Valeria Portilla R, Laura Ramirez
 - Universidad Autonoma de Occidente — Salud Digital 2026-1
