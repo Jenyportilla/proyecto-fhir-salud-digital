@@ -45,7 +45,6 @@ docker compose exec backend python seed_db.py
 |-----|-------|------------|
 | Admin | admin@clinica.com | Admin2026! |
 | Medico 1 | medico1@clinica.com | Medico2026! |
-| Medico 2 | medico2@clinica.com | Medico2026! |
 | Paciente | paciente@clinica.com | Paciente2026! |
 
 **API Keys:**
